@@ -6,7 +6,8 @@ pygame.init()               #inicia a bibliote
 
 rodando = True              #variavel para avisar o jogo quando deve fechar
 
-largura = 640, altura = 480 #definimos o tamanho da tela
+largura = 640               #definimos a largura da tela
+altura = 480                #definimos a altura da tela
 
 pontos = 0                  #declaramos a pontuação do jogo (ps. zerar quando quando der gameover)
 
