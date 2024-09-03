@@ -71,6 +71,15 @@ def moverJogador(jogador, teclas, dim_janela):
     if teclas['baixo'] and jogador['objRect'].bottom < borda_inferior:
         jogador['objRect'].y += jogador['vel']
 
+# Ocultando o cursor e redimensionando a imagem de fundo.
+pygame.mouse.set_visible(False)
+imagemFundoRedim = pygame.transform.scale(imagemFundo,(LARGURAJANELA, ALTURAJANELA))
+
+# configurando o som
+somEstrela = pygame.mixer.Sound('./resources/estrela.mp3')
+somMiado = pygame.mixer.Sound('./resources/miado.mp3')
+somEstrela.set_volume(0.1)
+somAtivado = True
             
 # Tela de inicio.
 colocarTexto('Tutubarão', fonte, janela, LARGURAJANELA / 5, ALTURAJANELA / 3)
@@ -111,6 +120,13 @@ while True:                                      #inica o laço do jogo
                     teclas['cima'] = True
                 if evento.key == pygame.K_DOWN or evento.key == pygame.K_s:
                     teclas['baixo'] = True
+                if evento.key == pygame.K_m:
+                    if somAtivado:
+                        pygame.mixer.music.stop()
+                        somAtivado = False
+                    else:
+                        pygame.mixer.music.play(-1, 0.0)
+                        somAtivado = True
 
             # quando uma tecla é solta
             if evento.type == pygame.KEYUP:
@@ -146,11 +162,11 @@ while True:                                      #inica o laço do jogo
 
         # checando se jogador pegou estrela
         for estrela in estrelas[:]:
-            comeu = jogador['objRect'].colliderect(estrela['objRect'])
-            if comeu or estrela['objRect'].x > LARGURAJANELA:
+            coletouEstrela = jogador['objRect'].colliderect(estrela['objRect'])
+            if coletouEstrela: 
                 estrelas.remove(estrela)
-                if comeu: pontuacao += 50
-
+                pontuacao += 50
+            if coletouEstrela and somAtivado: somEstrela.play()
         # desenhando estrelas
         for estrela in estrelas:
             janela.blit(estrela['imagem'], estrela['objRect'])
