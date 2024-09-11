@@ -8,6 +8,7 @@ pygame.init()
 LARGURA_TELA = 640
 ALTURA_TELA = 480
 VEL = 5
+VEL_FUNDO_EXTERNO = 2  # Velocidade menor para o fundo externo
 ITERACOES = 30
 CORTEXTO = (255, 255, 255)  # Cor do texto (branca)
 
@@ -17,27 +18,39 @@ pygame.display.set_caption('Naughty Cat')
 relogio = pygame.time.Clock()
 fonte = pygame.font.SysFont('arial', 40, True, True)
 
-# Carregar imagens (já copiado)
+# Carregar imagens
 cenarioInterno = pygame.image.load('./resources/image/projetoInterior.png').convert_alpha()
 cenarioExterno = pygame.image.load('./resources/image/projetoExterior.png').convert_alpha()
 imagemJogador = pygame.image.load('./resources/image/skinPlayer1.png').convert_alpha()
 imagemEstrela = pygame.image.load('./resources/image/estrela.png').convert_alpha()
 
-# Configurando imagens (já copiado)
-LARGURA_FUNDO = cenarioInterno.get_width()
-ALTURA_FUNDO = cenarioInterno.get_height()
+# Configurando imagens
+LARGURA_FUNDO_INTERNO = cenarioInterno.get_width()
+ALTURA_FUNDO_INTERNO = cenarioInterno.get_height()
+
+# Redimensionar o fundo externo para se ajustar à altura da tela
+LARGURA_FUNDO_EXTERNO = cenarioExterno.get_width()
+ALTURA_FUNDO_EXTERNO = cenarioExterno.get_height()
+escala = ALTURA_TELA / ALTURA_FUNDO_EXTERNO
+cenarioExterno = pygame.transform.scale(cenarioExterno, (int(LARGURA_FUNDO_EXTERNO * escala), ALTURA_TELA))
+LARGURA_FUNDO_EXTERNO = cenarioExterno.get_width()  # Atualizar após o redimensionamento
+
 LARGURA_JOGADOR = imagemJogador.get_width()
 ALTURA_JOGADOR = imagemJogador.get_height()
 LARGURAESTRELA = imagemEstrela.get_width()
 ALTURAESTRELA = imagemEstrela.get_height()
 
-# Função para mover o jogador e rolar o fundo (já copiado)
-def moverJogador(jogador, teclas, x_fundo, largura_fundo):
+# Função para mover o jogador e rolar os fundos
+def moverJogador(jogador, teclas, x_fundo_interno, x_fundo_externo):
     # Atualiza a posição do jogador
     if teclas['esquerda']:
         jogador['objRect'].x -= jogador['vel']
+        x_fundo_interno += jogador['vel']
+        x_fundo_externo += jogador['vel'] * VEL_FUNDO_EXTERNO / VEL
     if teclas['direita']:
         jogador['objRect'].x += jogador['vel']
+        x_fundo_interno -= jogador['vel']
+        x_fundo_externo -= jogador['vel'] * VEL_FUNDO_EXTERNO / VEL
     if teclas['cima']:
         jogador['objRect'].y -= jogador['vel']
     if teclas['baixo']:
@@ -47,15 +60,17 @@ def moverJogador(jogador, teclas, x_fundo, largura_fundo):
     jogador['objRect'].x = max(0, min(jogador['objRect'].x, LARGURA_TELA - LARGURA_JOGADOR))
     jogador['objRect'].y = max(0, min(jogador['objRect'].y, ALTURA_TELA - ALTURA_JOGADOR))
 
-    # Movimento do fundo
-    if jogador['objRect'].centerx > LARGURA_TELA // 2 and x_fundo > -(largura_fundo - LARGURA_TELA):
-        x_fundo -= jogador['vel']
-        jogador['objRect'].x -= jogador['vel']
-    elif jogador['objRect'].centerx < LARGURA_TELA // 2 and x_fundo < 0:
-        x_fundo += jogador['vel']
-        jogador['objRect'].x += jogador['vel']
+    # Para o fundo quando o jogador chegar ao fim
+    if x_fundo_interno <= -LARGURA_FUNDO_INTERNO + LARGURA_TELA:
+        x_fundo_interno = -LARGURA_FUNDO_INTERNO + LARGURA_TELA
+    if x_fundo_externo <= -LARGURA_FUNDO_EXTERNO + LARGURA_TELA:
+        x_fundo_externo = -LARGURA_FUNDO_EXTERNO + LARGURA_TELA
+    if x_fundo_interno >= 0:
+        x_fundo_interno = 0
+    if x_fundo_externo >= 0:
+        x_fundo_externo = 0
 
-    return x_fundo
+    return x_fundo_interno, x_fundo_externo
 
 def colocarTexto(texto, fonte, janela, x, y):
     objTexto = fonte.render(texto, True, CORTEXTO)
@@ -80,7 +95,7 @@ def finalizar():
 # Ocultando o cursor
 pygame.mouse.set_visible(False)
 
-# Configurando o som (já copiado)
+# Configurando o som
 somEstrela = pygame.mixer.Sound('./resources/sounds/estrela.mp3')
 somMiado = pygame.mixer.Sound('./resources/sounds/miado.mp3')
 somTrilha = pygame.mixer.Sound('./resources/sounds/trilha.mp3')
@@ -104,14 +119,14 @@ while True:
     teclas = {'esquerda': False, 'direita': False, 'cima': False, 'baixo': False}
     numInteracoes = 0
 
-    # Criando jogador (mudar de dicionário para classes)
+    # Criando jogador
     jogador = {'objRect': pygame.Rect(300, 100, LARGURA_JOGADOR, ALTURA_JOGADOR), 'imagem': imagemJogador, 'vel': VEL}
 
-    x_fundo = 0  # Posição inicial do fundo
-    
+    x_fundo_interno = 0  # Posição inicial do fundo interno
+    x_fundo_externo = 0  # Posição inicial do fundo externo
+
     rodando = True
 
-    #recebendo a movimentação do jogador (já copiado)
     while rodando:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
@@ -151,11 +166,12 @@ while True:
             posX = random.randint(0, LARGURA_TELA - LARGURAESTRELA)
             estrelas.append({'objRect': pygame.Rect(posX, posY, LARGURAESTRELA, ALTURAESTRELA), 'imagem': imagemEstrela})
 
-        # Movendo o jogador e o fundo
-        x_fundo = moverJogador(jogador, teclas, x_fundo, LARGURA_FUNDO)
+        # Movendo o jogador e os fundos
+        x_fundo_interno, x_fundo_externo = moverJogador(jogador, teclas, x_fundo_interno, x_fundo_externo)
 
-        # Desenhando o fundo
-        janela.blit(cenarioInterno, (x_fundo, 0))
+        # Desenhando os fundos (sem repetição)
+        janela.blit(cenarioExterno, (x_fundo_externo, 0))  # Fundo externo
+        janela.blit(cenarioInterno, (x_fundo_interno, 0))  # Fundo interno
 
         # Colocando as pontuações
         colocarTexto('Pontuação: ' + str(pontuacao), fonte, janela, 10, 0)
@@ -163,7 +179,7 @@ while True:
         # Desenhando jogador
         janela.blit(jogador['imagem'], jogador['objRect'])
 
-        # Checando se jogador pegou estrela (já copiado)
+        # Checando se jogador pegou estrela
         for estrela in estrelas[:]:
             coletouEstrela = jogador['objRect'].colliderect(estrela['objRect'])
             if coletouEstrela:
@@ -185,18 +201,3 @@ while True:
     pygame.display.update()
 
     aguardarEntrada()
-
-
-'''Jogo(main):
-Contém o loop principal.
-Inicializa as outras classes (cenário, jogador, estrelas, som, etc.).
-Controla o fluxo geral do jogo (iniciar, finalizar, reiniciar).
-
-Texto:
-Atributos: fonte, cor.
-Métodos: desenhar_texto(mensagem, posicao).
-
-TelaInicial:
-Métodos: desenhar(), aguardar_entrada().'''
-
-#esse é um teste
