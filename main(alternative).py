@@ -198,3 +198,5 @@ Métodos: desenhar_texto(mensagem, posicao).
 
 TelaInicial:
 Métodos: desenhar(), aguardar_entrada().'''
+
+#esse é um teste
