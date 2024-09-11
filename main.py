@@ -4,29 +4,17 @@ from sys import exit        #importar a função de fechar o jogo
 
 pygame.init()
 
-rodando = True              #variavel para avisar o jogo quando deve fechar
-
 relogio = pygame.time.Clock()                       #Definindo o parametro para criar o FPS
 
 # finaliza o jogo
 def finalizar():
     pygame.quit()
     exit()
+
 # carregando imagens
 imagemFundo = pygame.image.load('./resources/projetoInterior.png')
 imagemJogador = pygame.image.load('./resources/skinPlayer1.png')
 imagemEstrela = pygame.image.load('./resources/estrela.png')
-
-# definindo algumas constantes
-LARGURAJANELA = imagemFundo.get_width()               #definimos a largura da tela
-ALTURAJANELA = imagemFundo.get_height()               #definimos a altura da tela
-LARGURAJOGADOR = imagemJogador.get_width()
-ALTURAJOGADOR = imagemJogador.get_height()
-LARGURAESTRELA = imagemEstrela.get_width()
-ALTURAESTRELA = imagemEstrela.get_height()
-VEL = 5
-ITERACOES = 30
-CORTEXTO = (255, 255, 255) # cor do texto (branca)
 
 #Criando a janela
 janela = pygame.display.set_mode((LARGURAJANELA, ALTURAJANELA))   #Criação da tela do jogo
@@ -56,30 +44,9 @@ def aguardarEntrada():
                     finalizar()
                 return
 
-# funcao moverJogador() registra a posição do jogador
-def moverJogador(jogador, teclas, dim_janela):
-    borda_esquerda = 0
-    borda_superior = 0
-    borda_direita = dim_janela[0]
-    borda_inferior = dim_janela[1]
-    if teclas['esquerda'] and jogador['objRect'].left > borda_esquerda:
-        jogador['objRect'].x -= jogador['vel']
-    if teclas['direita'] and jogador['objRect'].right < borda_direita:
-        jogador['objRect'].x += jogador['vel']
-    if teclas['cima'] and jogador['objRect'].top > borda_superior:
-        jogador['objRect'].y -= jogador['vel']
-    if teclas['baixo'] and jogador['objRect'].bottom < borda_inferior:
-        jogador['objRect'].y += jogador['vel']
-
 # Ocultando o cursor e redimensionando a imagem de fundo.
 pygame.mouse.set_visible(False)
 imagemFundoRedim = pygame.transform.scale(imagemFundo,(LARGURAJANELA, ALTURAJANELA))
-
-# configurando o som
-somEstrela = pygame.mixer.Sound('./resources/estrela.mp3')
-somMiado = pygame.mixer.Sound('./resources/miado.mp3')
-somEstrela.set_volume(0.1)
-somAtivado = True
             
 # Tela de inicio.
 colocarTexto('Tutubarão', fonte, janela, LARGURAJANELA / 5, ALTURAJANELA / 3)
@@ -89,6 +56,7 @@ aguardarEntrada()
 
 while True:                                      #inica o laço do jogo
     relogio.tick(35)                                #o jogo roda a 35 fps
+    rodando = True              #variavel para avisar o jogo quando deve fechar
 
     # Configurando inicio do jogo
     pontuacao = 0
@@ -160,16 +128,6 @@ while True:                                      #inica o laço do jogo
         # desenhando jogador
         janela.blit(jogador['imagem'], jogador['objRect'])
 
-        # checando se jogador pegou estrela
-        for estrela in estrelas[:]:
-            coletouEstrela = jogador['objRect'].colliderect(estrela['objRect'])
-            if coletouEstrela: 
-                estrelas.remove(estrela)
-                pontuacao += 50
-            if coletouEstrela and somAtivado: somEstrela.play()
-        # desenhando estrelas
-        for estrela in estrelas:
-            janela.blit(estrela['imagem'], estrela['objRect'])
 
         # mostra tudo o que foi desenhado na tela
         pygame.display.update()
