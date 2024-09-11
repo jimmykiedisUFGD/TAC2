@@ -201,3 +201,5 @@ while True:
     pygame.display.update()
 
     aguardarEntrada()
+
+#teste
