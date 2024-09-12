@@ -12,9 +12,9 @@ def finalizar():
     exit()
 
 # carregando imagens
-imagemFundo = pygame.image.load('./resources/projetoInterior.png')
-imagemJogador = pygame.image.load('./resources/skinPlayer1.png')
-imagemEstrela = pygame.image.load('./resources/estrela.png')
+imagemFundo = pygame.image.load('./resources/image/projetoInterior.png')
+imagemJogador = pygame.image.load('./resources/image/skinPlayer1.png')
+imagemEstrela = pygame.image.load('./resources/image/estrela.png')
 
 #Criando a janela
 janela = pygame.display.set_mode((LARGURAJANELA, ALTURAJANELA))   #Criação da tela do jogo

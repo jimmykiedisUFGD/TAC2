@@ -11,9 +11,9 @@ def finalizar():
     pygame.quit()
     exit()
 # carregando imagens
-imagemFundo = pygame.image.load('./resources/projetoInterior.png')
-imagemJogador = pygame.image.load('./resources/skinPlayer1.png')
-imagemEstrela = pygame.image.load('./resources/estrela.png')
+imagemFundo = pygame.image.load('./resources/image/projetoInterior.png')
+imagemJogador = pygame.image.load('./resources/image/skinPlayer1.png')
+imagemEstrela = pygame.image.load('./resources/image/estrela.png')
 
 # definindo algumas constantes
 LARGURAJANELA = imagemFundo.get_width()               #definimos a largura da tela
@@ -74,8 +74,9 @@ pygame.mouse.set_visible(False)
 imagemFundoRedim = pygame.transform.scale(imagemFundo,(LARGURAJANELA, ALTURAJANELA))
 
 # configurando o som
-somEstrela = pygame.mixer.Sound('./resources/estrela.mp3')
-somMiado = pygame.mixer.Sound('./resources/miado.mp3')
+somEstrela = pygame.mixer.Sound('./resources/sounds/estrela.mp3')
+somMiado = pygame.mixer.Sound('./resources/sounds/miado.mp3')
+somTrilha = pygame.mixer.Sound('./resources/sounds/trilha.mp3')
 somEstrela.set_volume(0.1)
 somAtivado = True
             
