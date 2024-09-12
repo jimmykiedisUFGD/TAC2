@@ -12,7 +12,8 @@ def finalizar():
     exit()
 
 # carregando imagens
-imagemFundo = pygame.image.load('./resources/image/projetoInterior.png')
+cenarioInterior = pygame.image.load('./resources/image/projetoInterior.png')
+cenarioExterno = pygame.image.load('./resources/image/projetoExterior.png')
 imagemJogador = pygame.image.load('./resources/image/skinPlayer1.png')
 imagemEstrela = pygame.image.load('./resources/image/estrela.png')
 
@@ -22,7 +23,7 @@ pygame.display.set_caption('Naughty Cat')           #Colocando titulo na janela
 fonte = pygame.font.SysFont('arial', 40, True,True) #Criando a fonte para escrever na tela
 
 #carregando imagens
-imagemFundo = imagemFundo.convert_alpha()
+cenarioInterior = cenarioInterior.convert_alpha()
 imagemJogador = imagemJogador.convert_alpha()
 imagemEstrela = imagemEstrela.convert_alpha()
 
@@ -46,7 +47,7 @@ def aguardarEntrada():
 
 # Ocultando o cursor e redimensionando a imagem de fundo.
 pygame.mouse.set_visible(False)
-imagemFundoRedim = pygame.transform.scale(imagemFundo,(LARGURAJANELA, ALTURAJANELA))
+cenarioInteriorRedim = pygame.transform.scale(cenarioInterior,(LARGURAJANELA, ALTURAJANELA))
             
 # Tela de inicio.
 colocarTexto('Tutubarão', fonte, janela, LARGURAJANELA / 5, ALTURAJANELA / 3)
@@ -117,7 +118,7 @@ while True:                                      #inica o laço do jogo
                         'imagem': imagemEstrela})
         
         # preenchendo o fundo de janela com a sua imagem
-        janela.blit(imagemFundo, (0,0))
+        janela.blit(cenarioInterior, (0,0))
 
         # Colocando as pontuações.
         colocarTexto('Pontuação: ' + str(pontuacao), fonte, janela, 10, 0)

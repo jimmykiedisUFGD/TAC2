@@ -11,13 +11,14 @@ def finalizar():
     pygame.quit()
     exit()
 # carregando imagens
-imagemFundo = pygame.image.load('./resources/image/projetoInterior.png')
+cenarioInterior = pygame.image.load('./resources/image/projetoInterior.png')
+cenarioExterno = pygame.image.load('./resources/image/projetoExterior.png')
 imagemJogador = pygame.image.load('./resources/image/skinPlayer1.png')
 imagemEstrela = pygame.image.load('./resources/image/estrela.png')
 
 # definindo algumas constantes
-LARGURAJANELA = imagemFundo.get_width()               #definimos a largura da tela
-ALTURAJANELA = imagemFundo.get_height()               #definimos a altura da tela
+LARGURAJANELA = cenarioInterior.get_width()               #definimos a largura da tela
+ALTURAJANELA = cenarioInterior.get_height()               #definimos a altura da tela
 LARGURAJOGADOR = imagemJogador.get_width()
 ALTURAJOGADOR = imagemJogador.get_height()
 LARGURAESTRELA = imagemEstrela.get_width()
@@ -32,7 +33,7 @@ pygame.display.set_caption('Naughty Cat')           #Colocando titulo na janela
 fonte = pygame.font.SysFont('arial', 40, True,True) #Criando a fonte para escrever na tela
 
 #carregando imagens
-imagemFundo = imagemFundo.convert_alpha()
+cenarioInterior = cenarioInterior.convert_alpha()
 imagemJogador = imagemJogador.convert_alpha()
 imagemEstrela = imagemEstrela.convert_alpha()
 
@@ -71,7 +72,7 @@ def moverJogador(jogador, teclas, dim_janela):
 
 # Ocultando o cursor e redimensionando a imagem de fundo.
 pygame.mouse.set_visible(False)
-imagemFundoRedim = pygame.transform.scale(imagemFundo,(LARGURAJANELA, ALTURAJANELA))
+cenarioInteriorRedim = pygame.transform.scale(cenarioInterior,(LARGURAJANELA, ALTURAJANELA))
 
 # configurando o som
 somEstrela = pygame.mixer.Sound('./resources/sounds/estrela.mp3')
@@ -149,7 +150,7 @@ while True:                                      #inica o laço do jogo
                         'imagem': imagemEstrela})
         
         # preenchendo o fundo de janela com a sua imagem
-        janela.blit(imagemFundo, (0,0))
+        janela.blit(cenarioInterior, (0,0))
 
         # Colocando as pontuações.
         colocarTexto('Pontuação: ' + str(pontuacao), fonte, janela, 10, 0)
