@@ -123,10 +123,10 @@ while True:                                      #inica o laço do jogo
                     teclas['baixo'] = True
                 if evento.key == pygame.K_m:
                     if somAtivado:
-                        pygame.mixer.music.stop()
+                        somTrilha.stop()
                         somAtivado = False
                     else:
-                        pygame.mixer.music.play(-1, 0.0)
+                        somTrilha.play(-1, 0)
                         somAtivado = True
 
             # quando uma tecla é solta

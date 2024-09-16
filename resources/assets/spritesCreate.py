@@ -8,7 +8,7 @@ linhas = 10          # Número de linhas na spritesheet
 colunas = 10         # Número de colunas na spritesheet
 
 class SpritesheetLoader:
-    def __init__(self, imagem, largura_sprite, altura_sprite):
+    def __init__(self, imagem):
         """
         Inicializa o carregador de spritesheet.
         
