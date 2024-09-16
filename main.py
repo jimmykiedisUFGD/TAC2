@@ -24,6 +24,14 @@ arquivoEstrela = pygame.image.load('./resources/image/estrela.png').convert_alph
 jogadorSpriteLoader = spritesCreate.SpritesheetLoader(arquivoJogador)
 jogadorSprite = jogadorSpriteLoader.cortar_sprites(10, 10)
 
+#criando o carregador de sprites das plataformas de cenário
+plataformaSpriteLoader = spritesCreate.SpritesheetLoader(arquivoPlataformasCenario)
+plataformaSprite = plataformaSpriteLoader.cortar_sprites(10, 10)
+
+#criando o carregador de sprites dos objetos de cenário
+objetosSpriteLoader = spritesCreate.SpritesheetLoader(arquivoObjetosCenario)
+objetosSprite = objetosSpriteLoader.cortar_sprites(10, 10)
+
 # Sons
 somEstrela = pygame.mixer.Sound('resources/sounds/estrela.mp3')
 somMiado = pygame.mixer.Sound('./resources/sounds/miado.mp3')
