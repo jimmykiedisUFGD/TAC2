@@ -10,12 +10,22 @@ relogio = pygame.time.Clock()                       #Definindo o parametro para 
 def finalizar():
     pygame.quit()
     exit()
-
 # carregando imagens
 cenarioInterior = pygame.image.load('./resources/image/projetoInterior.png')
 cenarioExterno = pygame.image.load('./resources/image/projetoExterior.png')
 imagemJogador = pygame.image.load('./resources/image/skinPlayer1.png')
 imagemEstrela = pygame.image.load('./resources/image/estrela.png')
+
+# definindo algumas constantes
+LARGURAJANELA = cenarioInterior.get_width()               #definimos a largura da tela
+ALTURAJANELA = cenarioInterior.get_height()               #definimos a altura da tela
+LARGURAJOGADOR = imagemJogador.get_width()
+ALTURAJOGADOR = imagemJogador.get_height()
+LARGURAESTRELA = imagemEstrela.get_width()
+ALTURAESTRELA = imagemEstrela.get_height()
+VEL = 5
+ITERACOES = 30
+CORTEXTO = (255, 255, 255) # cor do texto (branca)
 
 #Criando a janela
 janela = pygame.display.set_mode((LARGURAJANELA, ALTURAJANELA))   #Criação da tela do jogo
@@ -45,9 +55,31 @@ def aguardarEntrada():
                     finalizar()
                 return
 
+# funcao moverJogador() registra a posição do jogador
+def moverJogador(jogador, teclas, dim_janela):
+    borda_esquerda = 0
+    borda_superior = 0
+    borda_direita = dim_janela[0]
+    borda_inferior = dim_janela[1]
+    if teclas['esquerda'] and jogador['objRect'].left > borda_esquerda:
+        jogador['objRect'].x -= jogador['vel']
+    if teclas['direita'] and jogador['objRect'].right < borda_direita:
+        jogador['objRect'].x += jogador['vel']
+    if teclas['cima'] and jogador['objRect'].top > borda_superior:
+        jogador['objRect'].y -= jogador['vel']
+    if teclas['baixo'] and jogador['objRect'].bottom < borda_inferior:
+        jogador['objRect'].y += jogador['vel']
+
 # Ocultando o cursor e redimensionando a imagem de fundo.
 pygame.mouse.set_visible(False)
 cenarioInteriorRedim = pygame.transform.scale(cenarioInterior,(LARGURAJANELA, ALTURAJANELA))
+
+# configurando o som
+somEstrela = pygame.mixer.Sound('./resources/sounds/estrela.mp3')
+somMiado = pygame.mixer.Sound('./resources/sounds/miado.mp3')
+somTrilha = pygame.mixer.Sound('./resources/sounds/trilha.mp3')
+somEstrela.set_volume(0.1)
+somAtivado = True
             
 # Tela de inicio.
 colocarTexto('Tutubarão', fonte, janela, LARGURAJANELA / 5, ALTURAJANELA / 3)
@@ -129,6 +161,16 @@ while True:                                      #inica o laço do jogo
         # desenhando jogador
         janela.blit(jogador['imagem'], jogador['objRect'])
 
+        # checando se jogador pegou estrela
+        for estrela in estrelas[:]:
+            coletouEstrela = jogador['objRect'].colliderect(estrela['objRect'])
+            if coletouEstrela: 
+                estrelas.remove(estrela)
+                pontuacao += 50
+            if coletouEstrela and somAtivado: somEstrela.play()
+        # desenhando estrelas
+        for estrela in estrelas:
+            janela.blit(estrela['imagem'], estrela['objRect'])
 
         # mostra tudo o que foi desenhado na tela
         pygame.display.update()
