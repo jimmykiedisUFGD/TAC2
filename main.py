@@ -11,6 +11,7 @@ pygame.display.set_caption('Naughty Cats')          #demos nomes pra tela do jog
 fonte = pygame.font.SysFont('arial', 40, True, True)#Criando a fonte para escrever na tela
 pygame.mouse.set_visible(False)                     #setando o mouse pra invisivel
 ITERACOES = 30                                      #uma constante aqui só para debug
+GRAVIDADE = 0.5                                     #constante para criar a gravidade
 
 # Carregando imagens
 cenarioInterior = pygame.image.load('./resources/image/projetoInterior.png').convert_alpha()
@@ -55,22 +56,35 @@ while True:                                         #inica o laço do jogo
     teclas = {'esquerda': False, 'direita': False, 'cima': False, 'baixo': False}                       #definindo o dicionario que guardará as direções
     numInteracoes = 0                                                                                   #marca o numero de interações
     
-    jogador = {'objRect': pygame.Rect(300, 100, 64, 64), 'imagem': jogadorSprite[0], 'vel': 0.6}       # criando jogador
+    jogador = {                                                                                         # criando jogador
+    'objRect': pygame.Rect(300, 100, 64, 64),
+    'imagem': jogadorSprite[0],
+    'vel': 0.6,
+    'velY': 0,
+    'noChao': False,
+    'pulando': False,
+    'forca_pulo': 10,
+    'tempo_pulo': 0
+    }
+    
+    plataformas = [{'objRect': pygame.Rect(0, altura - 50, largura, 50)}]  # Plataforma no fundo da tela
     
     while rodando:
-        for evento in pygame.event.get():                       #inicia o laço dos eventos de entrada do jogo
-            if evento.type == pygame.QUIT:                      #caso clicar no X da tela
-                introConfig.finalizar()                               # verificado, ele fecha
-
-            if evento.type == pygame.KEYDOWN:                   # Pressionar alguma tecla
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                introConfig.finalizar()
+            if evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_ESCAPE:
                     introConfig.finalizar()
+
                 if evento.key == pygame.K_LEFT or evento.key == pygame.K_a:
                     teclas['esquerda'] = True
                 if evento.key == pygame.K_RIGHT or evento.key == pygame.K_d:
                     teclas['direita'] = True
                 if evento.key == pygame.K_UP or evento.key == pygame.K_w:
-                    teclas['cima'] = True
+                    if jogador['noChao']:
+                        jogador['pulando'] = True
+                        jogador['tempo_pulo'] = 0  # Reinicia o tempo de pulo
                 if evento.key == pygame.K_DOWN or evento.key == pygame.K_s:
                     teclas['baixo'] = True
                 if evento.key == pygame.K_m:
@@ -78,19 +92,35 @@ while True:                                         #inica o laço do jogo
                         somTrilha.stop()
                         somAtivado = False 
                     else:
-                        somTrilha.play(-1, 0)  # '-1' para repetir indefinidamente
+                        somTrilha.play(-1, 0)
                         somAtivado = True
-                           
-              
-            if evento.type == pygame.KEYUP:                     # quando uma tecla é solta
+                        
+            if evento.type == pygame.KEYUP:
                 if evento.key == pygame.K_LEFT or evento.key == pygame.K_a:
                     teclas['esquerda'] = False
                 if evento.key == pygame.K_RIGHT or evento.key == pygame.K_d:
                     teclas['direita'] = False
                 if evento.key == pygame.K_UP or evento.key == pygame.K_w:
-                    teclas['cima'] = False
+                    jogador['pulando'] = False
                 if evento.key == pygame.K_DOWN or evento.key == pygame.K_s:
                     teclas['baixo'] = False
+
+        # Atualize a física do jogador
+        if not jogador['noChao']:
+            jogador['velY'] += GRAVIDADE
+        else:
+            jogador['velY'] = 0
+
+        # Controle do pulo
+        if jogador['pulando']:
+            jogador['tempo_pulo'] += 1
+            if jogador['tempo_pulo'] < 15:
+                jogador['velY'] = -jogador['forca_pulo']
+            else:
+                jogador['velY'] = -jogador['forca_pulo'] * 0.5
+            jogador['pulando'] = False
+
+        jogador['objRect'].y += jogador['velY']
 
         numInteracoes += 1
         if numInteracoes >= ITERACOES:
@@ -105,6 +135,8 @@ while True:                                         #inica o laço do jogo
         introConfig.colocarTexto('Pontuação: ' + str(pontuacao), fonte, tela, 10, 0)                      # Colocando as pontuações.
         
         jogadorConfig.moverJogador(jogador, teclas, (largura, altura))                                             # movendo o jogador
+        
+        jogadorConfig.verificar_colisao_chao(jogador, plataformas)                                  #verificando a fisica 
 
         tela.blit(jogador['imagem'], jogador['objRect'])                                             # desenhando jogador
         
