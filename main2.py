@@ -150,7 +150,8 @@ while True:                                      #inica o laço do jogo
                         'imagem': imagemEstrela})
         
         # preenchendo o fundo de janela com a sua imagem
-        janela.blit(cenarioInterior, (0,0))
+        janela.blit(cenarioExterno, (0, 0))
+        janela.blit(cenarioInterior, (0, 0))
 
         # Colocando as pontuações.
         colocarTexto('Pontuação: ' + str(pontuacao), fonte, janela, 10, 0)

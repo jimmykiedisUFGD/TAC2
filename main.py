@@ -1,8 +1,7 @@
 import pygame, random
 from pygame.locals import *
 from sys import exit
-from resources.assets import spritesCreate
-from resources.assets import intro
+from resources.assets import spritesCreate, intro
 
 pygame.init()                                       #iniciamos o pygame
 relogio = pygame.time.Clock()                       #Definindo o parametro para criar o FPS
@@ -33,7 +32,7 @@ somEstrela.set_volume(0.05)
 somAtivado = True
 
 # Exibe o texto inicial e aguarda a entrada
-intro.colocarTexto('Naughty Cats', fonte, tela, largura / 5, altura / 3)
+intro.colocarTexto('Naughty Cats', fonte, tela, largura / 3, altura / 2)
 intro.colocarTexto('Pressione uma tecla para começar.', fonte, tela, largura / 5, altura / 3)
 pygame.display.update()
 intro.aguardarEntrada()
@@ -78,12 +77,13 @@ while True:                                         #inica o laço do jogo
                 if evento.key == pygame.K_DOWN or evento.key == pygame.K_s:
                     teclas['baixo'] = True
                 if evento.key == pygame.K_m:
-                    if not somAtivado:
-                        somTrilha.play(-1, 0)  # '-1' para repetir indefinidamente
-                        somAtivado = True 
-                    else:
+                    if somAtivado:
                         somTrilha.stop()
-                        somAtivado = False   
+                        somAtivado = False 
+                    else:
+                        somTrilha.play(-1, 0)  # '-1' para repetir indefinidamente
+                        somAtivado = True
+                           
               
             if evento.type == pygame.KEYUP:                     # quando uma tecla é solta
                 if evento.key == pygame.K_LEFT or evento.key == pygame.K_a:
@@ -102,6 +102,7 @@ while True:                                         #inica o laço do jogo
             posX = random.randint(0, largura - 64)
             estrelas.append({'objRect': pygame.Rect(posX, posY, 64, 64), 'imagem': arquivoEstrela})
 
+        tela.blit(cenarioExterno, (0, 0))
         tela.blit(cenarioInterior, (0, 0))                                                          # preenchendo o fundo de janela com a sua imagem
         
         intro.colocarTexto('Pontuação: ' + str(pontuacao), fonte, tela, 10, 0)                      # Colocando as pontuações.
@@ -124,7 +125,7 @@ while True:                                         #inica o laço do jogo
 
     intro.colocarTexto('GAME OVER', fonte, tela, (largura / 3), (altura / 3))
     
-    intro.colocarTexto('Pressione uma tecla para jogar.', fonte, tela, (largura / 10), (altura / 2))
+    intro.colocarTexto('Pressione uma tecla para jogar.', fonte, tela, (largura / 0), (altura / 2))
     pygame.display.update()
     
     intro.aguardarEntrada()                                                                         # Aguardando entrada por teclado para reiniciar o jogo ou sair.
