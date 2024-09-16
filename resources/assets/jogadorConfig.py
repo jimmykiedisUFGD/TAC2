@@ -1,5 +1,3 @@
-
-
 def moverJogador(jogador, teclas, dim_janela):
     borda_esquerda = 0
     borda_superior = 0

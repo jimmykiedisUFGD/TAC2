@@ -1,7 +1,7 @@
 import pygame, random
 from pygame.locals import *
 from sys import exit
-from resources.assets import spritesCreate, intro
+from resources.assets import spritesCreate, introConfig, jogadorConfig
 
 pygame.init()                                       #iniciamos o pygame
 relogio = pygame.time.Clock()                       #Definindo o parametro para criar o FPS
@@ -40,21 +40,10 @@ somEstrela.set_volume(0.05)
 somAtivado = True
 
 # Exibe o texto inicial e aguarda a entrada
-intro.colocarTexto('Naughty Cats', fonte, tela, largura / 3, altura / 2)
-intro.colocarTexto('Pressione uma tecla para começar.', fonte, tela, largura / 5, altura / 3)
+introConfig.colocarTexto('Naughty Cats', fonte, tela, largura / 3, altura / 2)
+introConfig.colocarTexto('Pressione uma tecla para começar.', fonte, tela, largura / 5, altura / 3)
 pygame.display.update()
-intro.aguardarEntrada()
-
-# Função para mover o jogador
-def moverJogador(jogador, teclas, limites):
-    if teclas['esquerda'] and jogador['objRect'].left > 0:
-        jogador['objRect'].x -= jogador['vel']
-    if teclas['direita'] and jogador['objRect'].right < limites[0]:
-        jogador['objRect'].x += jogador['vel']
-    if teclas['cima'] and jogador['objRect'].top > 0:
-        jogador['objRect'].y -= jogador['vel']
-    if teclas['baixo'] and jogador['objRect'].bottom < limites[1]:
-        jogador['objRect'].y += jogador['vel']
+introConfig.aguardarEntrada()
 
 while True:                                         #inica o laço do jogo
     relogio.tick(24)                                #o jogo roda a 24 fps
@@ -71,11 +60,11 @@ while True:                                         #inica o laço do jogo
     while rodando:
         for evento in pygame.event.get():                       #inicia o laço dos eventos de entrada do jogo
             if evento.type == pygame.QUIT:                      #caso clicar no X da tela
-                intro.finalizar()                               # verificado, ele fecha
+                introConfig.finalizar()                               # verificado, ele fecha
 
             if evento.type == pygame.KEYDOWN:                   # Pressionar alguma tecla
                 if evento.key == pygame.K_ESCAPE:
-                    intro.finalizar()
+                    introConfig.finalizar()
                 if evento.key == pygame.K_LEFT or evento.key == pygame.K_a:
                     teclas['esquerda'] = True
                 if evento.key == pygame.K_RIGHT or evento.key == pygame.K_d:
@@ -113,9 +102,9 @@ while True:                                         #inica o laço do jogo
         tela.blit(cenarioExterno, (0, 0))
         tela.blit(cenarioInterior, (0, 0))                                                          # preenchendo o fundo de janela com a sua imagem
         
-        intro.colocarTexto('Pontuação: ' + str(pontuacao), fonte, tela, 10, 0)                      # Colocando as pontuações.
+        introConfig.colocarTexto('Pontuação: ' + str(pontuacao), fonte, tela, 10, 0)                      # Colocando as pontuações.
         
-        moverJogador(jogador, teclas, (largura, altura))                                             # movendo o jogador
+        jogadorConfig.moverJogador(jogador, teclas, (largura, altura))                                             # movendo o jogador
 
         tela.blit(jogador['imagem'], jogador['objRect'])                                             # desenhando jogador
         
@@ -131,9 +120,9 @@ while True:                                         #inica o laço do jogo
 
         pygame.display.update()                                                                     # mostra tudo o que foi desenhado na tela
 
-    intro.colocarTexto('GAME OVER', fonte, tela, (largura / 3), (altura / 3))
+    introConfig.colocarTexto('GAME OVER', fonte, tela, (largura / 3), (altura / 3))
     
-    intro.colocarTexto('Pressione uma tecla para jogar.', fonte, tela, (largura / 0), (altura / 2))
+    introConfig.colocarTexto('Pressione uma tecla para jogar.', fonte, tela, (largura / 0), (altura / 2))
     pygame.display.update()
     
-    intro.aguardarEntrada()                                                                         # Aguardando entrada por teclado para reiniciar o jogo ou sair.
+    introConfig.aguardarEntrada()                                                                         # Aguardando entrada por teclado para reiniciar o jogo ou sair.
