@@ -1,34 +1,114 @@
 import pygame, random
 from pygame.locals import *
 from sys import exit
-import os
+from .resources.assets import spritesCreate
+from .resources.assets import intro
 
 pygame.init()                                       #iniciamos o pygame
+relogio = pygame.time.Clock()                       #Definindo o parametro para criar o FPS
 largura, altura = 800, 640                          #constante do tamanho da tela
-spriteLarg = spiteAltu = 64                         #constante do tamanho das sprite sheets
 tela = pygame.display.set_mode((largura, altura))   #criamos a tela do jogo
 pygame.display.set_caption('Nautghty Cats')         #demos nomes pra tela do jogo
+fonte = pygame.font.SysFont('arial', 40, True,True) #Criando a fonte para escrever na tela
+pygame.mouse.set_visible(False)                     #setando o mouse pra invisivel
+ITERACOES = 30                                      #uma constante aqui só para debug
 
-cenarioInterior = pygame.image.load('./resources/image/projetoInterior.png').convert_alpha()            #carregaremos os cenários
-cenarioExterno = pygame.image.load('./resources/image/projetoExterior.png').convert_alpha()             #o externo será util
-Jogador = pygame.image.load('./resources/image/resources/image/projetoPlayer.png').convert_alpha()      #carrega a sprite sheet do jogador
-plataformasCenario = pygame.load('resources/image/projetoPlataformas.png').convert_alpha()              #carrega a sprite sheet das plataformas do cenário
-objetosCenario = pygame.load('resources/image/projetoObjetos.png').convert_alpha()                      #carrega a sprite sheet dos objetos de cenário
-Estrelas = pygame.image.load('./resources/image/estrela.png').convert_alpha()                           #carrega as estrelas
+cenarioInterior = pygame.image.load('./resources/image/projetoInterior.png').convert_alpha()                    #carregaremos os cenários
+cenarioExterno = pygame.image.load('./resources/image/projetoExterior.png').convert_alpha()                     #o externo será util
+arquivoJogador = pygame.image.load('./resources/image/resources/image/projetoPlayer.png').convert_alpha()       #carrega a sprite sheet do jogador
+arquivoPlataformasCenario = pygame.load('resources/image/projetoPlataformas.png').convert_alpha()               #carrega a sprite sheet das plataformas do cenário
+arquivoObjetosCenario = pygame.load('resources/image/projetoObjetos.png').convert_alpha()                       #carrega a sprite sheet dos objetos de cenário
+arquivoEstrela = pygame.image.load('./resources/image/estrela.png').convert_alpha()                             #carrega as estrelas
 
+jogadorSprite = spritesCreate.SpritesheetLoader(arquivoJogador, 64, 64)
 
-def finalizar():                                    #primeiro função que faremos será para finalizar o jogo
-    pygame.quit()
-    exit()
+somEstrela = pygame.mixer.Sound('./resources/sounds/estrela.mp3')   #importa o som da estrela
+somMiado = pygame.mixer.Sound('./resources/sounds/miado.mp3')       #importa o som do miado
+somTrilha = pygame.mixer.Sound('./resources/sounds/trilha.mp3')     #importa o som da trilha sonora
+somEstrela.set_volume(0.1)                                          #setando o volume necessário
+somAtivado = True                                                   #quando chamado o som inicia verdadeiro
+
+intro.colocarTexto('Naughty Cats', fonte, tela,  largura / 5, altura / 3)
+intro.colocarTexto('Pressione uma tecla para começar.', fonte, tela, largura / 5, altura / 3)
+pygame.display.update()
+intro.aguardarEntrada()
+
+while True:                                         #inica o laço do jogo
+    relogio.tick(24)                                #o jogo roda a 24 fps
+    rodando = True    
+
+    pontuacao = 0                                   #inicia a pontuação
+    estrelas = []                                   #a lista de entrelas é iniciada
     
-def cortarSprite(spriteSheet, spriteLarg, SpriteAltu, linhas, colunas):
-    sprites = []
-    for linha in range (linhas):
-        for coluna in range (colunas):
-            x = colunas * spriteLarg
-            y = linhas * SpriteAltu
-            imagem = spriteSheet.subsurface(pygame.Rect(x,y,spriteLarg,SpriteAltu))
-            sprites.append(imagem)
-    return sprites
+    teclas = {'esquerda': False, 'direita': False, 'cima': False, 'baixo': False}                       #definindo o dicionario que guardará as direções
+    numInteracoes = 0                                                                                   #marca o numero de interações
+    
+    jogador = {'objRect': pygame.Rect(300, 100, 64, 64), 'imagem': jogadorSprite[0][0], 'vel': 5}       # criando jogador
+    
+    while rodando:
+        for evento in pygame.event.get():                       #inicia o laço dos eventos de entrada do jogo
+            if evento.type == pygame.QUIT:                      #caso clicar no X da tela
+                intro.finalizar()                               # verificado, ele fecha
 
-def carregarSprite():
+            if evento.type == pygame.KEYDOWN:                   # Pressionar alguma tecla
+                if evento.key == pygame.K_ESCAPE:
+                    intro.finalizar()
+                if evento.key == pygame.K_LEFT or evento.key == pygame.K_a:
+                    teclas['esquerda'] = True
+                if evento.key == pygame.K_RIGHT or evento.key == pygame.K_d:
+                    teclas['direita'] = True
+                if evento.key == pygame.K_UP or evento.key == pygame.K_w:
+                    teclas['cima'] = True
+                if evento.key == pygame.K_DOWN or evento.key == pygame.K_s:
+                    teclas['baixo'] = True
+                if evento.key == pygame.K_m:
+                    if somAtivado:
+                        pygame.mixer.music.stop()
+                        somAtivado = False
+                    else:
+                        pygame.mixer.music.play(-1, 0.0)
+                        somAtivado = True    
+              
+            if evento.type == pygame.KEYUP:                     # quando uma tecla é solta
+                if evento.key == pygame.K_LEFT or evento.key == pygame.K_a:
+                    teclas['esquerda'] = False
+                if evento.key == pygame.K_RIGHT or evento.key == pygame.K_d:
+                    teclas['direita'] = False
+                if evento.key == pygame.K_UP or evento.key == pygame.K_w:
+                    teclas['cima'] = False
+                if evento.key == pygame.K_DOWN or evento.key == pygame.K_s:
+                    teclas['baixo'] = False
+
+        numInteracoes += 1
+        if numInteracoes >= ITERACOES:
+            numInteracoes = 0                                                                       # adicionando estrela
+            posY = random.randint(0, altura - 64)
+            posX = random.randint(0, largura - 64)
+            estrelas.append({'objRect': pygame.Rect(posX, posY,64, 64), 'imagem': arquivoEstrela})
+
+        tela.blit(cenarioInterior, (0,0))                                                           # preenchendo o fundo de janela com a sua imagem
+        
+        intro.colocarTexto('Pontuação: ' + str(pontuacao), fonte, tela, 10, 0)                      # Colocando as pontuações.
+        
+        jogador.moverJogador(jogador, teclas, (largura, altura))                                    # movendo o jogador
+
+        tela.blit(jogador['imagem'], jogador['objRect'])                                            # desenhando jogador
+        
+        for estrela in estrelas[:]:                                                                 # checando se jogador pegou estrela
+            coletouEstrela = jogador['objRect'].colliderect(estrela['objRect'])
+            if coletouEstrela: 
+                estrelas.remove(estrela)
+                pontuacao += 50
+            if coletouEstrela and somAtivado: somEstrela.play()
+
+        for estrela in estrelas:                                                                    # desenhando estrelas
+            tela.blit(estrela['imagem'], estrela['objRect'])
+
+        pygame.display.update()                                                                     # mostra tudo o que foi desenhado na tela
+
+    intro.colocarTexto('GAME OVER', fonte, tela, (largura / 3), (altura / 3))
+    
+    intro.colocarTexto('Pressione uma tecla para jogar.', fonte, tela, (largura / 10), (altura / 2))
+    pygame.display.update()
+    
+    intro.aguardarEntrada()                                                                         # Aguardando entrada por teclado para reiniciar o jogo ou sair.
