@@ -12,6 +12,7 @@ fonte = pygame.font.SysFont('arial', 40, True, True)#Criando a fonte para escrev
 pygame.mouse.set_visible(False)                     #setando o mouse pra invisivel
 ITERACOES = 30                                      #uma constante aqui só para debug
 GRAVIDADE = 0.5                                     #constante para criar a gravidade
+FORCA_PULO = 15                                     # Força do pulo aumentada para 12
 
 # Carregando imagens
 cenarioInterior = pygame.image.load('./resources/image/projetoInterior.png').convert_alpha()
@@ -32,6 +33,9 @@ plataformaSprite = plataformaSpriteLoader.cortar_sprites(10, 10)
 #criando o carregador de sprites dos objetos de cenário
 objetosSpriteLoader = spritesCreate.SpritesheetLoader(arquivoObjetosCenario)
 objetosSprite = objetosSpriteLoader.cortar_sprites(10, 10)
+
+#gerar as mascaras
+jogadorMasc = pygame.mask.from_surface(jogadorSprite[0])
 
 # Sons
 somEstrela = pygame.mixer.Sound('resources/sounds/estrela.mp3')
@@ -61,7 +65,7 @@ while True:                                         #inica o laço do jogo
     'imagem': jogadorSprite[0],
     'vel': 0.6,
     'velY': 0,
-    'noChao': False,
+    'noChao': True,
     'pulando': False,
     'forca_pulo': 10,
     'tempo_pulo': 0
@@ -82,9 +86,9 @@ while True:                                         #inica o laço do jogo
                 if evento.key == pygame.K_RIGHT or evento.key == pygame.K_d:
                     teclas['direita'] = True
                 if evento.key == pygame.K_UP or evento.key == pygame.K_w:
-                    if jogador['noChao']:
-                        jogador['pulando'] = True
-                        jogador['tempo_pulo'] = 0  # Reinicia o tempo de pulo
+                    if jogador['noChao']:  # Só pular se estiver no chão
+                        jogador['velY'] = -FORCA_PULO
+                        jogador['noChao'] = False  # Após o pulo, o jogador já não está mais no chão
                 if evento.key == pygame.K_DOWN or evento.key == pygame.K_s:
                     teclas['baixo'] = True
                 if evento.key == pygame.K_m:
@@ -100,27 +104,21 @@ while True:                                         #inica o laço do jogo
                     teclas['esquerda'] = False
                 if evento.key == pygame.K_RIGHT or evento.key == pygame.K_d:
                     teclas['direita'] = False
-                if evento.key == pygame.K_UP or evento.key == pygame.K_w:
-                    jogador['pulando'] = False
                 if evento.key == pygame.K_DOWN or evento.key == pygame.K_s:
                     teclas['baixo'] = False
 
-        # Atualize a física do jogador
+        # Aplicando gravidade
         if not jogador['noChao']:
             jogador['velY'] += GRAVIDADE
-        else:
-            jogador['velY'] = 0
-
-        # Controle do pulo
-        if jogador['pulando']:
-            jogador['tempo_pulo'] += 1
-            if jogador['tempo_pulo'] < 15:
-                jogador['velY'] = -jogador['forca_pulo']
-            else:
-                jogador['velY'] = -jogador['forca_pulo'] * 0.5
-            jogador['pulando'] = False
-
+        
+        # Atualizando a posição vertical do jogador
         jogador['objRect'].y += jogador['velY']
+
+        # Verificar se o jogador colidiu com o chão (plataforma)
+        jogadorConfig.verificar_colisao_chao(jogador, plataformas)
+        
+        # Atualizando o movimento do jogador no eixo X
+        jogadorConfig.moverJogador(jogador, teclas, (largura, altura))
 
         numInteracoes += 1
         if numInteracoes >= ITERACOES:
@@ -133,19 +131,16 @@ while True:                                         #inica o laço do jogo
         tela.blit(cenarioInterior, (0, 0))                                                          # preenchendo o fundo de janela com a sua imagem
         
         introConfig.colocarTexto('Pontuação: ' + str(pontuacao), fonte, tela, 10, 0)                      # Colocando as pontuações.
-        
-        jogadorConfig.moverJogador(jogador, teclas, (largura, altura))                                             # movendo o jogador
-        
-        jogadorConfig.verificar_colisao_chao(jogador, plataformas)                                  #verificando a fisica 
 
         tela.blit(jogador['imagem'], jogador['objRect'])                                             # desenhando jogador
         
         for estrela in estrelas[:]:                                                                 # checando se jogador pegou estrela
-            coletouEstrela = jogador['objRect'].colliderect(estrela['objRect'])
-            if coletouEstrela: 
+            deslocamento = (estrela['objRect'].x - jogador['objRect'].x, estrela['objRect'].y - jogador['objRect'].y)
+            if jogadorMasc.overlap(pygame.mask.from_surface(arquivoEstrela), deslocamento):
                 estrelas.remove(estrela)
                 pontuacao += 50
-            if coletouEstrela and somAtivado: somEstrela.play()
+                if somAtivado:
+                    somEstrela.play()
 
         for estrela in estrelas:                                                                    # desenhando estrelas
             tela.blit(estrela['imagem'], estrela['objRect'])
