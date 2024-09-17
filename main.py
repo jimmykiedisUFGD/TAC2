@@ -2,6 +2,7 @@ import pygame, random
 from pygame.locals import *
 from sys import exit
 from resources.assets import spritesCreate, introConfig, jogadorConfig
+import time
 
 pygame.init()                                       #iniciamos o pygame
 relogio = pygame.time.Clock()                       #Definindo o parametro para criar o FPS
@@ -13,6 +14,8 @@ pygame.mouse.set_visible(False)                     #setando o mouse pra invisiv
 ITERACOES = 30                                      #uma constante aqui só para debug
 GRAVIDADE = 0.5                                     #constante para criar a gravidade
 FORCA_PULO = 15                                     # Força do pulo aumentada para 12
+TEMPO_ENTRE_ESTRELAS = 2000  # Tempo mínimo entre estrelas em milissegundos
+ultimo_tempo_estrela = pygame.time.get_ticks()
 
 # Carregando imagens
 cenarioInterior = pygame.image.load('./resources/image/projetoInterior.png').convert_alpha()
@@ -121,8 +124,9 @@ while True:                                         #inica o laço do jogo
         jogadorConfig.moverJogador(jogador, teclas, (largura, altura))
 
         numInteracoes += 1
-        if numInteracoes >= ITERACOES:
-            numInteracoes = 0                                                                       # adicionando estrela
+        agora = pygame.time.get_ticks()
+        if agora - ultimo_tempo_estrela > TEMPO_ENTRE_ESTRELAS:
+            ultimo_tempo_estrela = agora  # Atualiza o tempo da última estrela gerada
             posY = random.randint(0, altura - 64)
             posX = random.randint(0, largura - 64)
             estrelas.append({'objRect': pygame.Rect(posX, posY, 64, 64), 'imagem': arquivoEstrela})
