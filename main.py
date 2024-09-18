@@ -74,7 +74,7 @@ while True:                                         #inica o laço do jogo
     'tempo_pulo': 0
     }
     
-    plataformas = [{'objRect': pygame.Rect(0, altura - 50, largura, 50)}]  # Plataforma no fundo da tela
+    plataformas = [{'objRect': pygame.Rect(0, altura - 50, largura, 50)}]       # Plataforma no fundo da tela
     
     while rodando:
         for evento in pygame.event.get():
@@ -89,9 +89,9 @@ while True:                                         #inica o laço do jogo
                 if evento.key == pygame.K_RIGHT or evento.key == pygame.K_d:
                     teclas['direita'] = True
                 if evento.key == pygame.K_UP or evento.key == pygame.K_w:
-                    if jogador['noChao']:  # Só pular se estiver no chão
+                    if jogador['noChao']:                                       # Só pular se estiver no chão
                         jogador['velY'] = -FORCA_PULO
-                        jogador['noChao'] = False  # Após o pulo, o jogador já não está mais no chão
+                        jogador['noChao'] = False                               # Após o pulo, o jogador já não está mais no chão
                 if evento.key == pygame.K_DOWN or evento.key == pygame.K_s:
                     teclas['baixo'] = True
                 if evento.key == pygame.K_m:
