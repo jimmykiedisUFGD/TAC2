@@ -5,10 +5,10 @@ from sys import exit
 pygame.init()
 
 # Variáveis e constantes do jogo
-LARGURA_TELA = 640
-ALTURA_TELA = 480
+LARGURA_TELA = 800
+ALTURA_TELA = 600
 VEL = 5
-VEL_FUNDO_EXTERNO = 2  # Velocidade menor para o fundo externo
+VEL_FUNDO_EXTERNO = 2.2  # Velocidade menor para o fundo externo
 ITERACOES = 30
 CORTEXTO = (255, 255, 255)  # Cor do texto (branca)
 
@@ -112,7 +112,6 @@ aguardarEntrada()
 
 # Loop principal do jogo
 while True:
-    relogio.tick(35)
 
     pontuacao = 0
     estrelas = []
@@ -201,5 +200,3 @@ while True:
     pygame.display.update()
 
     aguardarEntrada()
-
-#teste

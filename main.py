@@ -149,7 +149,7 @@ while True:                                         #inica o laço do jogo
         for estrela in estrelas:                                                                    # desenhando estrelas
             tela.blit(estrela['imagem'], estrela['objRect'])
 
-        pygame.display.update()                                                                     # mostra tudo o que foi desenhado na tela
+        pygame.display.flip()                                                                     # mostra tudo o que foi desenhado na tela
 
     introConfig.colocarTexto('GAME OVER', fonte, tela, (largura / 3), (altura / 3))
     
