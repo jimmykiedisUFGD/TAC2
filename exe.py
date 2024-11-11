@@ -6,7 +6,7 @@ pygame.init()
 telaLargura = 1000
 telaAltura = 1000
 
-tela = pygame.dysplay.set_mode((telaAltura, telaAltura))
+tela = pygame.display.set_mode((telaAltura, telaAltura))
 pygame.display.set_caption('Naughty Cat 2.1')
 
 cenarioInterior = pygame.image.load ('resources/image/projetoInterior.png')
